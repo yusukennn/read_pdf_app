@@ -1,9 +1,17 @@
+
 import os,sys
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 from pathlib import Path
+
+import re
+import glob
+from pathlib import Path
+from pdf2image import convert_from_path
+import MeCab
+from wordcloud import WordCloud
 
 # フォルダ指定の関数
 def dirdialog_clicked():
@@ -46,9 +54,6 @@ def all_processing(image_dir):
     make_wordcloud(full_txt)
 
 def pdf_to_jpg(dirPath):# pdfをjpegに変換
-    import glob
-    from pathlib import Path
-    from pdf2image import convert_from_path
 
     # PDFファイルのパス
     files = glob.glob(dirPath + "/*")
@@ -87,7 +92,7 @@ def jpg_to_str(jpg_path): # jpg画像から文字列を読み取る関数
     return txt
 
 def format_text(text):# 分かち書きの前処理する関数
-    import re
+    
     text=re.sub(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-…]+', "", text)
     text=re.sub(' ', "", text)
     text=re.sub(r'[!-~]', "", text)#半角記号,数字,英字
@@ -140,6 +145,7 @@ def wakati_text(text):# 分かち書きする関数
 
 def make_wordcloud(text): #wordcloud画像を作成し，ディレクトリに出力する関数
     wordcloud_file = "./wordcloud_file"
+    png_path = "./wordcloud_file/wordcloud_sample.png"
     if not os.path.exists(wordcloud_file):
         os.makedirs(wordcloud_file)
     stop_words = [ u'てる', u'いる', u'なる', u'れる', u'する', u'ある', u'こと', u'これ', u'さん', u'して', \
@@ -152,7 +158,7 @@ def make_wordcloud(text): #wordcloud画像を作成し，ディレクトリに�
                           stopwords = set(stop_words),
                           collocations = False,
                           width=800,height=600).generate(text)
-    wordcloud.to_file(wordcloud_file)
+    wordcloud.to_file(png_path)
 
 if __name__ == "__main__":
 
